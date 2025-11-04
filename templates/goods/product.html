@@ -1,0 +1,121 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8"/>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+  <link rel="stylesheet" href="{% static 'css/bootstrap/bootstrap.min.css' %}">
+  <link rel="stylesheet" href="{% static 'css/my_css.css' %}">
+  <link rel="apple-touch-icon" sizes="180x180" href="{% static 'favicon/apple-touch-icon.png' %}">
+  <link rel="icon" type="image/png" sizes="32x32" href="{% static 'favicon/favicon-32x32.png' %}">
+  <link rel="icon" type="image/png" sizes="16x16" href="{% static 'favicon/favicon-16x16.png' %}">
+  <link rel="manifest" href="{% static 'favicon/site.webmanifest' %}">
+  <title>{{ product.title }}</title>
+</head>
+<body>
+
+<header>
+  {% include 'partials/navbar.html' %}
+</header>
+
+<section>
+  <div class="container">
+    <!-- фикс-панель -->
+    <div class="row mt-1 position-fixed z-3" style="left:1; right:15;">
+      <!-- КАТАЛОГ: dropdown -->
+      <div class="col-auto">
+        <div class="dropdown mb-2">
+          <button class="btn btn-secondary dropdown-toggle btn-dark" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Каталог
+            <img class="mx-1" src="{% static 'icons/grid-fill.svg' %}" alt="Catalog Icon" width="16" height="16">
+          </button>
+          <ul class="dropdown-menu dropdown-menu-dark">
+            <li><a class="dropdown-item" href="{% url 'catalog:catalog' %}">Все товары</a></li>
+            {% for c in categories %}
+              <li><a class="dropdown-item" href="{% url 'catalog:catalog' %}?category={{ c.slug }}">{{ c.name }}</a></li>{% empty %}
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+
+      <div class="col-auto">
+        <a class="btn btn-dark d-inline-flex align-items-center gap-1 px-2 py-1" href="{% url 'cart:detail' %}">
+          <img class="mx-1" src="{% static 'icons/basket2-fill.svg' %}" width="25" height="25" alt="">
+          <span id="goods-in-cart-count">{{ cart.items|length }}</span>
+        </a>
+      </div>
+    </div>
+
+    <div style="height:90px;"></div>
+  </div>
+
+  <!-- Контент товара -->
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-6 mb-3">
+        <div class="card h-100">
+          {% if product.image %}
+            <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.title }}">
+          {% else %}
+            <img src="{% static 'images/Not found image.png' %}" class="card-img-top" alt="">
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="col-lg-6 mb-3">
+        <div class="bg-white p-4 rounded custom-shadow h-100 d-flex flex-column">
+          <h1 class="h3 mb-3">{{ product.title }}</h1>
+
+          <div class="mb-3">
+            {% if product.old_price %}
+              <span class="me-2"><s>{{ product.old_price }}</s> $</span>
+            {% endif %}
+            <span class="fw-bold">{{ product.price }} $</span>
+          </div>
+
+          <p class="text-muted">{{ product.description }}</p>
+
+          <form action="{% url 'cart:add' product.id %}" method="post" class="mt-auto">
+            {% csrf_token %}
+            <div class="input-group" style="max-width:260px;">
+              <button class="btn btn-dark" type="submit">
+                <img class="mx-1" src="{% static 'icons/cart-plus.svg' %}" alt="" width="20" height="20">
+                В корзину
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="py-4 bg-dark mt-5">
+  <div class="container">
+    <p class="m-0 text-center text-white">Copyright &copy; Home Python Hub Studio 2023</p>
+  </div>
+</footer>
+
+<script src="{% static 'js/jquery/jquery-3.7.0.min.js' %}"></script>
+<script src="{% static 'js/bootstrap/bootstrap.bundle.min.js' %}"></script>
+
+<script>
+  // маленькая логика для кнопок -/+
+  document.addEventListener('DOMContentLoaded', function () {
+    const input = document.getElementById('qty-input');
+    const dec = document.getElementById('qty-dec');
+    const inc = document.getElementById('qty-inc');
+    const min = parseInt(input.min || '1', 10);
+
+    dec?.addEventListener('click', () => {
+      input.value = Math.max(parseInt(input.value || '1', 10) - 1, min);
+    });
+    inc?.addEventListener('click', () => {
+      input.value = Math.max(parseInt(input.value || '1', 10) + 1, min);
+    });
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,126 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8"/>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+  <link rel="stylesheet" href="{% static 'css/bootstrap/bootstrap.min.css' %}">
+  <link rel="stylesheet" href="{% static 'css/my_css.css' %}">
+  <link rel="apple-touch-icon" sizes="180x180" href="{% static 'favicon/apple-touch-icon.png' %}">
+  <link rel="icon" type="image/png" sizes="32x32" href="{% static 'favicon/favicon-32x32.png' %}">
+  <link rel="icon" type="image/png" sizes="16x16" href="{% static 'favicon/favicon-16x16.png' %}">
+  <link rel="manifest" href="{% static 'favicon/site.webmanifest' %}">
+  <title>Корзина</title>
+</head>
+<body>
+
+<header>
+  {% include 'partials/navbar.html' %}
+</header>
+
+<main class="container my-4">
+  <h3 class="text-center mb-4">Корзина</h3>
+
+  <div id="cart-items-container">
+    {% if cart.items %}
+      {% for item in cart.items %}
+        <div class="card mb-3 text-bg-light shadow-sm">
+          <div class="card-header">
+            <h5 class="card-title mb-0">{{ item.product.title }}</h5>
+          </div>
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item">
+              <div class="row text-center align-items-center g-2">
+
+                <!-- +/- блок -->
+                <div class="col p-0">
+  <!-- − -->
+  <form class="d-inline" action="{% url 'cart:update' item.product.id %}" method="post">
+    {% csrf_token %}
+    <input type="hidden" name="qty" value="{{ item.qty|add:'-1' }}">
+    <button type="submit" class="btn btn-dark btn-sm" {% if item.qty <= 1 %}disabled{% endif %}>-</button>
+  </form>
+
+  <!-- current qty -->
+  <input type="text" class="form-control text-center number mx-1"
+         value="{{ item.qty }}" style="max-width:80px" readonly>
+
+  <!-- + (clamped to stock, disabled at max) -->
+  <form class="d-inline" action="{% url 'cart:update' item.product.id %}" method="post">
+    {% csrf_token %}
+    {% with next=item.qty|add:'1' %}
+      <input type="hidden" name="qty"
+             value="{% if next > item.product.stock %}{{ item.product.stock }}{% else %}{{ next }}{% endif %}">
+    {% endwith %}
+    <button type="submit" class="btn btn-dark btn-sm"
+            {% if item.qty >= item.product.stock %}disabled{% endif %}>+</button>
+  </form>
+
+  {# optional hint #}
+  {% if item.qty >= item.product.stock %}
+    <small class="text-danger d-block mt-1">Доступно максимум {{ item.product.stock }} шт.</small>
+  {% endif %}
+</div>
+
+
+                <div class="col p-0">
+                  <p class="mb-0">x {{ item.product.price }} =</p>
+                </div>
+
+                <!-- сумма по позиции -->
+                <div class="col p-0">
+                  <strong>{{ item.total }}</strong>
+                </div>
+
+                <!-- удалить -->
+                <div class="col p-0">
+                  <form action="{% url 'cart:remove' item.product.id %}" method="post">
+                    {% csrf_token %}
+                    <button class="btn btn-link p-0" title="Удалить">
+                      <img class="mx-1" src="{% static 'icons/trash3-fill.svg' %}" alt="Удалить" width="16" height="16">
+                    </button>
+                  </form>
+                </div>
+
+              </div>
+            </li>
+          </ul>
+        </div>
+      {% endfor %}
+
+      <!-- Итого -->
+      <div class="card mb-3 shadow-sm">
+        <div class="card-footer d-flex justify-content-between align-items-center">
+          <p class="mb-0">Итого <strong>{{ cart.items|length }}</strong> товар(а) на сумму</p>
+          <h4 class="mb-0"><strong>{{ cart.total }} $</strong></h4>
+        </div>
+      </div>
+
+      <div class="d-flex gap-2">
+        <a class="btn btn-outline-dark" href="{% url 'catalog:catalog' %}">Продолжить покупки</a>
+        <a class="btn btn-dark" href="{% url 'orders:create_order' %}">Оформить заказ</a>
+
+      </div>
+
+    {% else %}
+      <p class="text-center my-5">Корзина пуста</p>
+      <div class="text-center">
+        <a class="btn btn-dark" href="{% url 'catalog:catalog' %}">В каталог</a>
+      </div>
+    {% endif %}
+  </div>
+</main>
+
+<footer class="py-4 bg-dark mt-5">
+  <div class="container">
+    <p class="m-0 text-center text-white">Copyright &copy; Home Python Hub Studio 2023</p>
+  </div>
+</footer>
+
+<script src="{% static 'js/jquery/jquery-3.7.0.min.js' %}"></script>
+<script src="{% static 'js/bootstrap/bootstrap.bundle.min.js' %}"></script>
+</body>
+</html>

@@ -1,0 +1,85 @@
+{% load static %}
+{% load widget_tweaks %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link rel="stylesheet" href="{% static 'css/bootstrap/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/my_css.css' %}">
+    <title>Регистрация</title>
+</head>
+<body>
+<header>{% include 'partials/navbar.html' %}</header>
+
+<section>
+    <div class="container">
+        <div class="row mt-4 justify-content-center">
+            <div class="col-md-6 bg-white p-4 rounded custom-shadow">
+                <h2 class="text-center mb-4">Создать аккаунт</h2>
+
+                {# accounts.views.register returns UserCreationForm as {{ form }} #}
+                <form method="post" action="">
+  {% csrf_token %}
+
+  {% if form.non_field_errors %}
+    <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+  {% endif %}
+
+  <div class="mb-3">
+    <label class="form-label" for="{{ form.username.id_for_label }}">Имя пользователя</label>
+    {% render_field form.username class+="form-control" placeholder="username" %}
+    {{ form.username.errors }}
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label" for="{{ form.password1.id_for_label }}">Пароль</label>
+    {% render_field form.password1 class+="form-control" %}
+    {{ form.password1.errors }}
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label" for="{{ form.password2.id_for_label }}">Подтверждение пароля</label>
+    {% render_field form.password2 class+="form-control" %}
+    {{ form.password2.errors }}
+  </div>
+
+  {# optional extra fields if your RegisterForm includes them #}
+  <div class="row">
+    <div class="col-md-6 mb-3">
+      <label class="form-label" for="{{ form.first_name.id_for_label }}">Имя</label>
+      {% render_field form.first_name class+="form-control" placeholder="Введите ваше имя" %}
+      {{ form.first_name.errors }}
+    </div>
+    <div class="col-md-6 mb-3">
+      <label class="form-label" for="{{ form.last_name.id_for_label }}">Фамилия</label>
+      {% render_field form.last_name class+="form-control" placeholder="Введите вашу фамилию" %}
+      {{ form.last_name.errors }}
+    </div>
+    <div class="col-md-12 mb-3">
+      <label class="form-label" for="{{ form.email.id_for_label }}">Email</label>
+      {% render_field form.email class+="form-control" placeholder="you@example.com" %}
+      {{ form.email.errors }}
+    </div>
+  </div>
+
+  <button type="submit" class="btn btn-dark">Зарегистрироваться</button>
+</form>
+
+
+                <div class="mt-3 text-center">
+                    Уже есть аккаунт? <a href="{% url 'accounts:login' %}">Войти</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<footer class="py-4 bg-dark mt-5">
+    <div class="container"><p class="m-0 text-center text-white">© Home Python Hub Studio 2023</p></div>
+</footer>
+
+<script src="{% static 'js/jquery/jquery-3.7.0.min.js' %}"></script>
+<script src="{% static 'js/bootstrap/bootstrap.bundle.min.js' %}"></script>
+</body>
+</html>
