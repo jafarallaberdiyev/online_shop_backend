@@ -1,0 +1,38 @@
+{% load static %}
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <title>Про нас</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="{% static 'css/bootstrap/bootstrap.min.css' %}" rel="stylesheet">
+  <link href="{% static 'css/my_css.css' %}" rel="stylesheet">
+</head>
+<body>
+<header>
+  {% include 'partials/navbar.html' %}
+</header>
+
+<main class="container my-4">
+  <div class="bg-white rounded-3 p-4 shadow">
+    <h1 class="mb-3">Про нас</h1>
+    <p class="lead">Мы — магазин мебели HOME. Помогаем обустроить дом, офис и любые пространства с 20XX года.</p>
+    <hr>
+    <h3 class="mt-4">Наши ценности</h3>
+    <ul class="mb-3">
+      <li>Честные цены и прозрачные условия</li>
+      <li>Быстрая доставка и аккуратная сборка</li>
+      <li>Поддержка клиентов 7 дней в неделю</li>
+    </ul>
+    <h3 class="mt-4">Почему мы?</h3>
+    <p>Большой каталог, надежные поставщики, расширенная гарантия и обмен/возврат согласно закону.</p>
+  </div>
+</main>
+
+<footer class="py-4 bg-dark mt-5">
+  <div class="container"><p class="m-0 text-center text-white">© Home 2025</p></div>
+</footer>
+
+<script src="{% static 'js/bootstrap/bootstrap.bundle.min.js' %}"></script>
+</body>
+</html>

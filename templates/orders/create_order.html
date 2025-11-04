@@ -1,0 +1,226 @@
+{% load static %}
+{% load widget_tweaks %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link rel="stylesheet" href="{% static 'css/bootstrap/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/my_css.css' %}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'favicon/apple-touch-icon.png' %}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'favicon/favicon-32x32.png' %}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'favicon/favicon-16x16.png' %}">
+    <link rel="manifest" href="{% static 'favicon/site.webmanifest' %}">
+    <title>Оформление заказа</title>
+</head>
+<body>
+
+<header>
+    {% include 'partials/navbar.html' %}
+</header>
+
+<section>
+    <div class="container">
+        <!-- Верхняя панель (делаем липкой, чтобы не перекрывала контент) -->
+        <div class="row mt-1 sticky-top z-3">
+            <div class="dropdown mb-2">
+                <button class="btn btn-secondary dropdown-toggle btn-dark" type="button" data-bs-toggle="dropdown"
+                        aria-expanded="false">
+                    Каталог
+                    <img class="mx-1" src="{% static 'icons/grid-fill.svg' %}" alt="Каталог" width="16" height="16">
+                </button>
+                <ul class="dropdown-menu bg-dark" data-bs-theme="dark">
+                    <li><a class="dropdown-item text-white" href="{% url 'catalog:catalog' %}">Все товары</a></li>
+                    {% if categories %}
+                        {% for c in categories %}
+                            <li>
+                                <a class="dropdown-item text-white"
+                                   href="{% url 'catalog:catalog' %}?category={{ c.slug }}">{{ c.name }}</a>
+                            </li>
+                        {% endfor %}
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Контент -->
+    <div class="container pb-4">
+        <div class="row mt-1">
+            <div class="col-lg-2"></div>
+
+            <div class="col-lg-10">
+                <div class="bg-white p-4 mb-4 mx-2 rounded custom-shadow">
+
+                    <!-- Выбранные товары -->
+                    <div class="container mb-4">
+                        <h3 class="text-center mb-4">Выбранные товары</h3>
+
+                        <div id="cart-items-container">
+                            {% if cart.items %}
+                                {% for item in cart.items %}
+                                    <div class="card mb-3 text-bg-light shadow-sm">
+                                        <div class="card-header d-flex justify-content-between align-items-center">
+                                            <h5 class="card-title mb-0">
+                                                <a class="text-decoration-none"
+                                                   href="{% url 'catalog:product_detail' slug=item.product.slug %}">
+                                                    {{ item.product.title }}
+                                                </a>
+                                            </h5>
+                                            <a class="btn btn-sm btn-outline-secondary"
+                                               href="{% url 'cart:detail' %}">Изменить</a>
+                                        </div>
+                                        <ul class="list-group list-group-flush">
+                                            <li class="list-group-item">
+                                                <div class="row text-center align-items-center g-2">
+                                                    <div class="col p-0">
+                                                        <input type="text" class="form-control text-center"
+                                                               value="{{ item.qty }}" style="max-width:80px" readonly>
+                                                    </div>
+                                                    <div class="col p-0"><p class="mb-0">x {{ item.product.price }} =</p></div>
+                                                    <div class="col p-0"><strong>{{ item.total }}</strong></div>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                {% endfor %}
+
+                                <div class="card mb-3 shadow-sm">
+                                    <div class="card-footer d-flex justify-content-between align-items-center flex-wrap">
+                                        <p class="mb-0">Итого <strong>{{ cart.items|length }}</strong> товар(а) на сумму</p>
+                                        <h4 class="mb-0"><strong>{{ cart.total }} $</strong></h4>
+                                    </div>
+                                </div>
+                            {% else %}
+                                <p class="text-center my-4">Корзина пуста. <a href="{% url 'catalog:catalog' %}">Перейти в каталог</a></p>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Детали заказа -->
+                    <div class="container">
+                        <h3 class="text-center mb-3">Детали заказа</h3>
+
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <form method="post" action="">
+                                    {% csrf_token %}
+
+                                    {% if form.non_field_errors %}
+                                        <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+                                    {% endif %}
+
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label" for="{{ form.first_name.id_for_label }}">Имя*</label>
+                                            {% render_field form.first_name class+="form-control" %}
+                                            {{ form.first_name.errors }}
+                                        </div>
+
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label" for="{{ form.last_name.id_for_label }}">Фамилия</label>
+                                            {% render_field form.last_name class+="form-control" %}
+                                            {{ form.last_name.errors }}
+                                        </div>
+
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label" for="{{ form.email.id_for_label }}">Email*</label>
+                                            {% render_field form.email class+="form-control" %}
+                                            {{ form.email.errors }}
+                                        </div>
+
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label" for="{{ form.phone.id_for_label }}">Телефон*</label>
+                                            {% render_field form.phone class+="form-control" placeholder="XXX-XXX-XX-XX" %}
+                                            {{ form.phone.errors }}
+                                        </div>
+
+                                        <!-- Способ доставки -->
+                                        <div class="col-12 mb-3">
+                                            <label class="form-label d-block">Способ доставки*</label>
+                                            <div class="d-flex gap-4 flex-wrap align-items-center">
+                                                {% for sub in form.delivery_method %}
+                                                <div class="form-check form-check-inline m-0">
+                                                    {{ sub.tag }}
+                                                    <label class="form-check-label" for="{{ sub.id_for_label }}">{{ sub.choice_label }}</label>
+                                                </div>
+                                                {% endfor %}
+                                            </div>
+                                            {{ form.delivery_method.errors }}
+                                        </div>
+
+
+                                        <!-- Адрес (прячем при самовывозе) -->
+                                        <div id="address-block" class="row">
+                                            <div class="col-md-8 mb-3">
+                                                <label class="form-label" for="{{ form.address.id_for_label }}">Адрес*</label>
+                                                {% render_field form.address class+="form-control" %}
+                                                {{ form.address.errors }}
+                                            </div>
+                                            <div class="col-md-4 mb-3">
+                                                <label class="form-label" for="{{ form.city.id_for_label }}">Город*</label>
+                                                {% render_field form.city class+="form-control" %}
+                                                {{ form.city.errors }}
+                                            </div>
+                                        </div>
+
+                                        <!-- Способ оплаты -->
+                                        <div class="col-12 mb-3">
+  <label class="form-label d-block">Способ оплаты*</label>
+  <div class="d-flex gap-4 flex-wrap align-items-center">
+    {% for sub in form.payment_method %}
+      <div class="form-check form-check-inline m-0">
+        {{ sub.tag }}
+        <label class="form-check-label" for="{{ sub.id_for_label }}">{{ sub.choice_label }}</label>
+      </div>
+    {% endfor %}
+  </div>
+  {{ form.payment_method.errors }}
+</div>
+
+                                    </div>
+
+                                    <button type="submit" class="btn btn-dark">Оформить заказ</button>
+                                    <a href="{% url 'cart:detail' %}" class="btn btn-outline-secondary ms-2">Вернуться в корзину</a>
+                                </form>
+                            </div>
+                        </div>
+
+                        <p class="text-muted small mb-0">
+                            * Поля, обязательные для заполнения. После оформления вы увидите сообщение об успешном заказе.
+                        </p>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<footer class="py-4 bg-dark mt-5">
+    <div class="container">
+        <p class="m-0 text-center text-white">Copyright &copy; Home Python Hub Studio 2023</p>
+    </div>
+</footer>
+
+<script src="{% static 'js/jquery/jquery-3.7.0.min.js' %}"></script>
+<script src="{% static 'js/bootstrap/bootstrap.bundle.min.js' %}"></script>
+
+<!-- Прячем адрес при "Самовывоз" -->
+<script>
+  (function () {
+    const name = "{{ form.delivery_method.name|default:'delivery_method' }}";
+    const radios = document.getElementsByName(name);
+    const addressBlock = document.getElementById("address-block");
+    function toggleAddress() {
+      const v = Array.from(radios).find(r => r.checked)?.value || "delivery";
+      addressBlock.style.display = (v === "pickup") ? "none" : "";
+    }
+    radios.forEach(r => r.addEventListener("change", toggleAddress));
+    toggleAddress();
+  })();
+</script>
+
+</body>
+</html>

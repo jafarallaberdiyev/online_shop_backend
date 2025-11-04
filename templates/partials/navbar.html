@@ -1,0 +1,63 @@
+{% load static %}
+<header>
+  <nav class="navbar navbar-expand-lg bg-dark" data-bs-theme="dark">
+    <div class="container">
+      <a class="navbar-brand" href="{% url 'catalog:index' %}">Home</a>
+
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+              data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+              aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+
+          <!-- Информация -->
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle text-white" href="#" role="button"
+               data-bs-toggle="dropdown" aria-expanded="false">
+              Информация
+            </a>
+            <ul class="dropdown-menu dropdown-menu-dark">
+              <li><a class="dropdown-item" href="{% url 'info:about' %}">Про нас</a></li>
+              <li><a class="dropdown-item" href="{% url 'info:shipping_payment' %}">Доставка и оплата</a></li>
+              <li><a class="dropdown-item" href="{% url 'info:contacts' %}">Контактная информация</a></li>
+            </ul>
+          </li>
+
+          <!-- Корзина (страница) -->
+          <li class="nav-item">
+            <a class="nav-link text-white" href="{% url 'cart:detail' %}">Корзина</a>
+          </li>
+
+          <!-- Логин/Профиль -->
+          {% if request.user.is_authenticated %}
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle text-white" href="#" role="button"
+                 data-bs-toggle="dropdown" aria-expanded="false">
+                Мой профиль
+              </a>
+              <ul class="dropdown-menu dropdown-menu-dark">
+                <li><a class="dropdown-item" href="{% url 'cart:detail' %}">Корзина</a></li>
+                <li><a class="dropdown-item" href="{% url 'accounts:profile' %}">Личный кабинет</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="{% url 'accounts:logout' %}">Выйти</a></li>
+              </ul>
+            </li>
+          {% else %}
+            <li class="nav-item">
+              <a class="nav-link text-white" href="{% url 'accounts:login' %}">Войти</a>
+            </li>
+          {% endif %}
+        </ul>
+
+        <!-- Поиск: отправляет на /catalog/?q=... -->
+        <form class="d-flex" role="search" method="get" action="{% url 'catalog:catalog' %}">
+          <input class="form-control me-2" type="search" name="q" placeholder="Search" value="{{ request.GET.q }}" aria-label="Search">
+          <button class="btn btn-outline-success text-white" type="submit">Поиск</button>
+        </form>
+      </div>
+    </div>
+  </nav>
+</header>
